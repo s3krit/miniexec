@@ -1,0 +1,23 @@
+GIT
+  remote: https://github.com/trevor-vaughan/docker-api/
+  revision: 48c9a9dafc9dc41be37bf262ab67194b765f8311
+  branch: podman-compat
+  specs:
+    docker-api (2.0.0)
+      excon (>= 0.47.0)
+      multi_json
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    excon (0.79.0)
+    multi_json (1.15.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  docker-api!
+
+BUNDLED WITH
+   2.1.4

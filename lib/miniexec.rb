@@ -1,16 +1,12 @@
-#!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'pry'
-require 'logger'
-require 'docker-api'
-require 'json'
-require 'tempfile'
-require 'yaml'
-require 'optparse'
-
-# a
+# Main class
 class MiniExec
+  require 'logger'
+  require 'docker-api'
+  require 'json'
+  require 'tempfile'
+  require 'yaml'
   # Class instance variables
   @project_path = '.'
   @workflow_file = '.gitlab-ci.yml'

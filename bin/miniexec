@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'miniexec'
+require 'optparse'
+
+options = {
+  binds: [],
+  env: []
+}
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: miniexec.rb [options]'
+  opts.separator ''
+  opts.separator 'specific options:'
+
+  opts.on('-p', '--path PATH', 'Path to the repository containing a valid .gitlab-ci.yml') do |path|
+    options[:path] = path
+  end
+
+  opts.on('-j', '--job JOBNAME', 'Specify the gitlab job to run') do |job|
+    options[:job] = job
+  end
+
+  opts.on('-b', '--bind BIND', 'Specify a bind mapping',
+          'Example: /some/local/dir:/mapping/in/container') do |bind|
+    options[:binds].push bind
+  end
+  opts.on('-e', '--environment VARIABLE',
+          'Specify an environment variable to be passed to the container',
+          'Example: SOMEVAR=thing') do |env|
+    options[:env].push env
+  end
+  opts.on('-d', '--docker-url URL',
+          'Location of the docker socket') do |sock|
+    options[:docker] = sock || ENV['DOCKER_HOST'] || '/run/docker.sock'
+  end
+end.parse!
+
+raise OptionParser::MissingArgument, 'Specify a job with -j' if options[:job].nil?
+raise OptionParser::MissingArgument, 'Specify a job with -p' if options[:path].nil?
+
+MiniExec.config(project_path: options[:path])
+exec = MiniExec.new options[:job],
+                    docker_url: options[:docker],
+                    binds: options[:binds],
+                    env: options[:env]
+
+exec.run_job
