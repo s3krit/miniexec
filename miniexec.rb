@@ -31,7 +31,8 @@ class MiniExec
                  project_path: self.class.project_path,
                  workflow_file: self.class.workflow_file,
                  docker_url: nil,
-                 binds: [])
+                 binds: [],
+                 env: [])
     @job_name = job
     @project_path = project_path
     workflow = YAML.load(File.read("#{@project_path}/#{workflow_file}"))
@@ -41,9 +42,10 @@ class MiniExec
     @image = set_job_image
     @script = compile_script
     @binds = binds
+    @env = env
 
-    @logger = Logger.new($stdout)
-    @logger.level = ENV['LOGLEVEL'] || Logger::WARN
+    configure_logger
+
     Docker.options[:read_timeout] = 6000
     Docker.url = docker_url if docker_url
   end
@@ -56,14 +58,13 @@ class MiniExec
     Dir.chdir(@project_path) do
       @logger.debug 'Creating container'
       container = Docker::Container.create(
-        #Cmd: ['/bin/bash', script_path],
-        Cmd: ['sleep', '6000'],
+        Cmd: ['/bin/bash', script_path],
         Image: @image,
-        Binds: ['/home/x/parity/code/polkadot/:/builds/']
+        Volumes: @binds.map { |b| { b => { path_parent: 'rw' } } }.inject(:merge),
+        Env: @env
       )
       container.store_file(script_path, @script)
-      binding.pry
-      container.start
+      container.start({ Binds: [@binds] })
       container.tap(&:start).attach { |_, chunk| @logger.info chunk }
     end
   end
@@ -76,6 +77,14 @@ class MiniExec
     @default_image
   end
 
+  def configure_logger
+    @logger = Logger.new($stdout)
+    @logger.formatter = proc do |severity, _, _, msg|
+      "[#{severity}]: #{msg}\n"
+    end
+    @logger.level = ENV['LOGLEVEL'] || Logger::WARN
+  end
+
   def compile_script
     before_script = @job['before_script'] || []
     script = @job['script'] || []
@@ -85,7 +94,8 @@ class MiniExec
 end
 
 options = {
-  binds: []
+  binds: [],
+  env: []
 }
 
 OptionParser.new do |opts|
@@ -105,6 +115,11 @@ OptionParser.new do |opts|
           'Example: /some/local/dir:/mapping/in/container') do |bind|
     options[:binds].push bind
   end
+  opts.on('-e', '--environment VARIABLE',
+          'Specify an environment variable to be passed to the container',
+          'Example: SOMEVAR=thing') do |env|
+    options[:env].push env
+  end
 end.parse!
 
 raise OptionParser::MissingArgument, 'Specify a job with -j' if options[:job].nil?
@@ -113,6 +128,7 @@ raise OptionParser::MissingArgument, 'Specify a job with -p' if options[:path].n
 MiniExec.config(project_path: options[:path])
 exec = MiniExec.new options[:job],
                     docker_url: 'unix:///var/run/user/1000/podman/podman.sock',
-                    binds: options[:binds]
+                    binds: options[:binds],
+                    env: options[:env]
 
 exec.run_job
