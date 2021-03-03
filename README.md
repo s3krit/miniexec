@@ -12,3 +12,10 @@ specific options:
     -e, --environment VARIABLE       Specify an environment variable to be passed to the container
                                      Example: SOMEVAR=thing
 ```
+
+# TODO
+- [ ] Fake Gitlab's auto-generated environment variables
+- [ ] Pass the run context without needing to specify an additional volume
+- [ ] Try to hook the image-pulling to print output
+- [ ] Shell detection? (at the moment, we just assume all image shells are /bin/bash...)
+- [ ] Allow passing an env-file in addition to individual env vars
