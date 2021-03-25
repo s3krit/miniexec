@@ -7,6 +7,8 @@ class MiniExec
   require 'json'
   require 'tempfile'
   require 'yaml'
+  require 'git'
+  require 'pry'
   # Class instance variables
   @project_path = '.'
   @workflow_file = '.gitlab-ci.yml'
@@ -17,7 +19,7 @@ class MiniExec
 
   def self.config(project_path: @project_path, workflow_file: @workflow_file)
     @project_path = project_path
-    @class = workflow_file
+    @workflow_file = workflow_file
     self
   end
 
@@ -25,23 +27,20 @@ class MiniExec
 
   def initialize(job,
                  project_path: self.class.project_path,
-                 workflow_file: self.class.workflow_file,
                  docker_url: nil,
                  binds: [],
-                 env: [])
+                 env: {})
     @job_name = job
     @project_path = project_path
-    workflow = YAML.load(File.read("#{@project_path}/#{workflow_file}"))
-    @job = workflow[job]
+    @workflow = YAML.load(File.read("#{@project_path}/#{MiniExec.workflow_file}"))
+    @job = @workflow[job]
     @job['name'] = job
-    @default_image = workflow['image'] || 'debian:buster-slim'
+    @default_image = @workflow['image'] || 'debian:buster-slim'
     @image = set_job_image
     @script = compile_script
     @binds = binds
-    @env = env
-
+    @env = env.merge gitlab_env, variables
     configure_logger
-
     Docker.options[:read_timeout] = 6000
     Docker.url = docker_url if docker_url
   end
@@ -57,7 +56,7 @@ class MiniExec
         Cmd: ['/bin/bash', script_path],
         Image: @image,
         Volumes: @binds.map { |b| { b => { path_parent: 'rw' } } }.inject(:merge),
-        Env: @env
+        Env: @env.map { |k, v| "#{k}=#{v}" }
       )
       container.store_file(script_path, @script)
       container.start({ Binds: [@binds] })
@@ -71,6 +70,39 @@ class MiniExec
     return @job['image'] if @job['image']
 
     @default_image
+  end
+
+  # Set gitlab's predefined env vars as per
+  # https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
+  def gitlab_env
+    g = Git.open(@project_path)
+    commit = g.gcommit 'HEAD'
+    tag = g.tags.find { |t| t.objectish == commit.sha }
+    commit_branch = g.branch.name
+    if tag.nil?
+      ref_name = g.branch.name
+      commit_tag = nil
+    else
+      ref_name = tag.name
+      commit_tag = ref_name
+    end
+    {
+      'CI': true,
+      'CI_COMMIT_REF_SHA': commit.sha,
+      'CI_COMMIT_SHORT_SHA': commit.sha[0, 8],
+      'CI_COMMIT_REF_NAME': ref_name,
+      'CI_COMMIT_BRANCH': commit_branch,
+      'CI_COMMIT_TAG': commit_tag,
+      'CI_COMMIT_MESSAGE': commit.message,
+      'CI_COMMIT_REF_PROTECTED': false,
+      'CI_COMMIT_TIMESTAMP': commit.date.strftime('%FT%T')
+    }.transform_keys(&:to_s)
+  end
+
+  def variables
+    globals = @workflow['variables']
+    job_locals = @job['variables']
+    globals.merge job_locals
   end
 
   def configure_logger

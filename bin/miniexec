@@ -6,7 +6,7 @@ require 'optparse'
 
 options = {
   binds: [],
-  env: []
+  env: {}
 }
 
 OptionParser.new do |opts|
@@ -29,7 +29,8 @@ OptionParser.new do |opts|
   opts.on('-e', '--environment VARIABLE',
           'Specify an environment variable to be passed to the container',
           'Example: SOMEVAR=thing') do |env|
-    options[:env].push env
+    k, v = env.split('=')
+    options[:env][k] = v
   end
   opts.on('-d', '--docker-url URL',
           'Location of the docker socket') do |sock|

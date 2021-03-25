@@ -11,13 +11,17 @@ GEM
   remote: https://rubygems.org/
   specs:
     excon (0.79.0)
+    git (1.8.1)
+      rchardet (~> 1.8)
     multi_json (1.15.0)
+    rchardet (1.8.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   docker-api!
+  git
 
 BUNDLED WITH
    2.1.4
