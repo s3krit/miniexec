@@ -8,7 +8,6 @@ class MiniExec
   require 'tempfile'
   require 'yaml'
   require 'git'
-  require 'pry'
   # Class instance variables
   @project_path = '.'
   @workflow_file = '.gitlab-ci.yml'
