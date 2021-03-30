@@ -8,6 +8,7 @@ class MiniExec
   require 'tempfile'
   require 'yaml'
   require 'git'
+  require 'pry'
   # Class instance variables
   @project_path = '.'
   @workflow_file = '.gitlab-ci.yml'
@@ -42,6 +43,7 @@ class MiniExec
     configure_logger
     Docker.options[:read_timeout] = 6000
     Docker.url = docker_url if docker_url
+    binding.pry
   end
 
   def run_job
