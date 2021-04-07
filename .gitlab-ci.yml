@@ -1,4 +1,6 @@
 image: debian:latest
+variables:
+  three: threee
 stages:
   - test
 
@@ -32,3 +34,9 @@ anchor-test:
     - one
     - *inside_anchor
     - three
+
+variables-test:
+  variables:
+    one: 1
+    two: ttwwoo
+  script: 'hello, world'

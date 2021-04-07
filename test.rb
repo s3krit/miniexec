@@ -4,6 +4,7 @@
 # some we can pinch
 
 require 'rspec/autorun'
+require 'pry'
 require_relative 'lib/miniexec'
 
 describe MiniExec do
@@ -27,5 +28,15 @@ describe MiniExec do
   it 'handles anchors in .gitlab-ci.yml' do
     exec = MiniExec.new 'anchor-test'
     expect(exec.script).to eq("one\ntwo\nthree")
+  end
+
+  it 'parses global and local variables' do
+    exec = MiniExec.new 'variables-test'
+    vars = { one: 1, two: 'ttwwoo', three: 'threee' }
+    env = exec.instance_variable_get(:@env)
+    vars.each do |k, v|
+      expect(env.key?(k.to_s)).to be_truthy
+      expect(env[k.to_s]).to eq(v)
+    end
   end
 end
