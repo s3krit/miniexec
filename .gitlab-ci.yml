@@ -10,6 +10,26 @@ stages:
 .inside_anchor: &inside_anchor
   - two
 
+miniexec-example-1:
+  stage: test
+  script: |
+    sleep 2
+    echo "Thanks for using MiniExec!"
+
+miniexec-example-2:
+  stage: test
+  script: |
+    sleep 2
+    cat /build/README.md
+
+miniexec-example-3:
+  stage: test
+  script: |
+    sleep 2
+    echo "Here are your environment variables:"
+    echo "$MY_USER"
+    echo "$MY_KEY"
+
 basic-test:
   stage: test
   image: ubuntu:latest
@@ -22,6 +42,7 @@ no-image-test:
   script: "echo 'hello'"
 
 before-after-script-test:
+  stage: test
   before_script: one
   after_script: four
   script: |
@@ -29,6 +50,7 @@ before-after-script-test:
     three
 
 anchor-test:
+  stage: test
   <<: *outside_anchor
   script:
     - one
@@ -36,6 +58,7 @@ anchor-test:
     - three
 
 variables-test:
+  stage: test
   variables:
     one: 1
     two: ttwwoo
