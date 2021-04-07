@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = 'miniexec'
-  s.version = '0.0.5'
+  s.version = '0.0.6'
   s.summary = 'exec a gitlab job'
   s.description = 'A minimal interpretor/executor for .gitlab-ci.yml'
   s.authors = ['Martin Pugh']

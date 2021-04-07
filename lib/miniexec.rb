@@ -59,7 +59,7 @@ class MiniExec
       )
       container.store_file(script_path, @script)
       container.start({ Binds: [@binds] })
-      container.tap(&:start).attach { |_, chunk| @logger.info chunk }
+      container.tap(&:start).attach { |_, chunk| puts chunk }
     end
   end
 
