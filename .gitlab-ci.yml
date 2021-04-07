@@ -1,0 +1,34 @@
+image: debian:latest
+stages:
+  - test
+
+.outside_anchor: &outside_anchor
+  image: fedora:latest
+
+.inside_anchor: &inside_anchor
+  - two
+
+basic-test:
+  stage: test
+  image: ubuntu:latest
+  script: |
+    echo 'hello'
+    echo 'goodbye'
+
+no-image-test:
+  stage: test
+  script: "echo 'hello'"
+
+before-after-script-test:
+  before_script: one
+  after_script: four
+  script: |
+    two
+    three
+
+anchor-test:
+  <<: *outside_anchor
+  script:
+    - one
+    - *inside_anchor
+    - three

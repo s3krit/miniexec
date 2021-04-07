@@ -1,12 +1,17 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+lib = File.expand_path('../lib', __dir__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'miniexec'
 require 'optparse'
+require 'pry'
 
 options = {
   binds: [],
-  env: {}
+  env: {},
+  path: '.',
+  docker: ENV['DOCKER_HOST'] || '/run/docker.sock'
 }
 
 OptionParser.new do |opts|
@@ -34,17 +39,15 @@ OptionParser.new do |opts|
   end
   opts.on('-d', '--docker-url URL',
           'Location of the docker socket') do |sock|
-    options[:docker] = sock || ENV['DOCKER_HOST'] || '/run/docker.sock'
+    options[:docker] = sock
   end
 end.parse!
 
 raise OptionParser::MissingArgument, 'Specify a job with -j' if options[:job].nil?
-raise OptionParser::MissingArgument, 'Specify a job with -p' if options[:path].nil?
 
 MiniExec.config(project_path: options[:path])
 exec = MiniExec.new options[:job],
                     docker_url: options[:docker],
                     binds: options[:binds],
                     env: options[:env]
-
 exec.run_job

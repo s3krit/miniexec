@@ -8,7 +8,6 @@ class MiniExec
   require 'tempfile'
   require 'yaml'
   require 'git'
-  require 'pry'
   # Class instance variables
   @project_path = '.'
   @workflow_file = '.gitlab-ci.yml'
@@ -43,16 +42,15 @@ class MiniExec
     configure_logger
     Docker.options[:read_timeout] = 6000
     Docker.url = docker_url if docker_url
-    binding.pry
   end
 
   def run_job
     script_path = "/tmp/#{@job['name']}.sh"
-    @logger.debug "Fetching image #{@image}"
+    @logger.info "Fetching image #{@image}"
     Docker::Image.create(fromImage: @image)
-    @logger.debug 'Image fetched'
+    @logger.info 'Image fetched'
     Dir.chdir(@project_path) do
-      @logger.debug 'Creating container'
+      @logger.info 'Creating container'
       container = Docker::Container.create(
         Cmd: ['/bin/bash', script_path],
         Image: @image,
@@ -101,8 +99,8 @@ class MiniExec
   end
 
   def variables
-    globals = @workflow['variables']
-    job_locals = @job['variables']
+    globals = @workflow['variables'] || {}
+    job_locals = @job['variables'] || {}
     globals.merge job_locals
   end
 
@@ -111,13 +109,13 @@ class MiniExec
     @logger.formatter = proc do |severity, _, _, msg|
       "[#{severity}]: #{msg}\n"
     end
-    @logger.level = ENV['LOGLEVEL'] || Logger::WARN
+    @logger.level = ENV['LOGLEVEL'] || Logger::INFO
   end
 
   def compile_script
-    before_script = @job['before_script'] || []
-    script = @job['script'] || []
-    after_script = @job['after_script'] || []
-    (before_script + script + after_script).flatten.join("\n")
+    before_script = @job['before_script'] || ''
+    script = @job['script'] || ''
+    after_script = @job['after_script'] || ''
+    [before_script, script, after_script].flatten.join("\n").strip
   end
 end
