@@ -38,7 +38,10 @@ class MiniExec
     @image = set_job_image
     @script = compile_script
     @binds = binds
-    @env = env.merge gitlab_env, variables
+    @env = {}
+    @env.merge! env
+    @env.merge! gitlab_env
+    @env.merge! variables
     configure_logger
     Docker.options[:read_timeout] = 6000
     Docker.url = docker_url if docker_url
