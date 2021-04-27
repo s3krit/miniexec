@@ -88,6 +88,8 @@ miniexec -j miniexec-example-3 -e MY_USER=$USER -e MY_KEY=c3r34l-k1ll4h
 # What doesn't
 
 - MiniExec currently makes the assumption that the job is a shell-script and that `/bin/bash` is present.
+- If the image used doesn't set a WORKDIR properly (so defaults to root), and you want to read/write files properly, it can be a bit broken.
+- If you uncleanly exit `miniexec`, you'll probably have to kill the container manually.
 - Sometimes the first couple lines of output in a job will be skipped
 - Advanced Gitlab CI features like services
 - Running full pipelines
