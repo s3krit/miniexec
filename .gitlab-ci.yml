@@ -1,6 +1,8 @@
 image: debian:latest
 variables:
   three: threee
+  variable_expansion_one: works
+  variable_expansion_two: works
 stages:
   - test
 
@@ -63,3 +65,10 @@ variables-test:
     one: 1
     two: ttwwoo
   script: 'hello, world'
+
+internal-variable-expansion-test:
+  stage: test
+  variables:
+    foo: ${variable_expansion_one}
+    bar: $variable_expansion_two
+  script: echo "$foo" "$bar"
