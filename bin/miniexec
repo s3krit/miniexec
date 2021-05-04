@@ -44,9 +44,9 @@ end.parse!
 
 raise OptionParser::MissingArgument, 'Specify a job with -j' if options[:job].nil?
 
-MiniExec.config(project_path: options[:path])
-exec = MiniExec.new options[:job],
-                    docker_url: options[:docker],
-                    binds: options[:binds],
-                    env: options[:env]
+MiniExec::MiniExec.config(project_path: options[:path])
+exec = MiniExec::MiniExec.new options[:job],
+                              docker_url: options[:docker],
+                              binds: options[:binds],
+                              env: options[:env]
 exec.run_job
