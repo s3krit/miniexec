@@ -31,7 +31,7 @@ describe MiniExec do
 
   it 'parses global and local variables' do
     exec = MiniExec::MiniExec.new 'variables-test'
-    vars = { one: "1", two: 'ttwwoo', three: 'threee' }
+    vars = { one: '1', two: 'ttwwoo', three: 'threee' }
     env = exec.instance_variable_get(:@env)
     vars.each do |k, v|
       expect(env.key?(k.to_s)).to be_truthy
@@ -48,4 +48,23 @@ describe MiniExec do
       expect(env[k.to_s]).to eq(v)
     end
   end
+
+  it 'runs basic jobs' do
+    exec = MiniExec::MiniExec.new 'miniexec-example-1'
+    exec.run_job
+    expect(exec.runlog.join("\n")).to eq("Thanks for using MiniExec!\n")
+  end
+
+  it 'mounts CWD by default' do
+    exec = MiniExec::MiniExec.new 'default-mount-test'
+    exec.run_job
+    expect(exec.runlog.join("\n").chomp).to eq('.gitlab-ci.yml')
+  end
+
+# TODO: Make this work
+#  it 'supports not mounting CWD' do
+#    exec = MiniExec::MiniExec.new 'default-mount-test', mount_cwd: false
+#    exec.run_job
+#    expect(exec.runlog.join("\n").chomp).to eq('/gitlab/.gitlab-ci.yml')
+#  end
 end

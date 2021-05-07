@@ -60,10 +60,14 @@ miniexec -j miniexec-example-1
 `miniexec` will then attempt to spawn a Docker container using the image
 specified for that job (or the global image), and execute the steps in that job.
 
-It's likely that you *also* want to pass the contents of your current directory
-to some location inside that container. In the next example, we'll do exactly
-that. We'll mount the current working directory to the `/build` directory and
-cat README.md (the file you're reading right now!)
+By default, miniexec will attempt to detect the [WorkDir](https://docs.docker.com/engine/reference/builder/#workdir)
+of the container - if this is not set, the WorkDir will be set to `/gitlab`.
+The contents of the working directory will also automatically be mounted inside
+the container to the WorkDir.
+
+You can mount additional directories using the `-b` flag. The following example
+will mount the current working directory to `/build` and echo `README.md` (the
+file you're reading right now!)
 
 ```
 miniexec -j miniexec-example-2 -b $PWD:/build
@@ -87,8 +91,7 @@ miniexec -j miniexec-example-3 -e MY_USER=$USER -e MY_KEY=c3r34l-k1ll4h
 
 # What doesn't
 
-- MiniExec currently makes the assumption that the job is a shell-script and that `/bin/bash` is present.
-- If the image used doesn't set a WORKDIR properly (so defaults to root), and you want to read/write files properly, it can be a bit broken.
+- MiniExec currently makes the assumption that the job is a shell-script and that `/bin/bash` is present - This is a gitlab restriction more than MiniExec's fault
 - If you uncleanly exit `miniexec`, you'll probably have to kill the container manually.
 - Sometimes the first couple lines of output in a job will be skipped
 - Advanced Gitlab CI features like services

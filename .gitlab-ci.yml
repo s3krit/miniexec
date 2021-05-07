@@ -72,3 +72,9 @@ internal-variable-expansion-test:
     foo: ${variable_expansion_one}
     bar: $variable_expansion_two
   script: echo "$foo" "$bar"
+
+default-mount-test:
+  stage: test
+  script: |
+    sleep 2
+    ls /gitlab/.gitlab-ci.yml
