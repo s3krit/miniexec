@@ -9,7 +9,6 @@ module MiniExec
     require 'tempfile'
     require 'yaml'
     require 'git'
-    require 'pry'
     require_relative './util'
     # Class instance variables
     @project_path = '.'
