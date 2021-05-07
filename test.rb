@@ -58,7 +58,7 @@ describe MiniExec do
   it 'mounts CWD by default' do
     exec = MiniExec::MiniExec.new 'default-mount-test'
     exec.run_job
-    expect(exec.runlog.join("\n").chomp).to eq('.gitlab-ci.yml')
+    expect(exec.runlog.join("\n").chomp).to eq('/gitlab/.gitlab-ci.yml')
   end
 
 # TODO: Make this work
