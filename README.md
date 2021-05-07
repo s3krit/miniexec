@@ -1,3 +1,4 @@
+![miniexec logo](https://raw.githubusercontent.com/s3krit/miniexec/master/res/miniexec_logo_128.png)
 # miniexec
 
 A minimal interpretor/executor for .gitlab-ci.yml files
