@@ -80,7 +80,7 @@ module MiniExec
           Cmd: ['/usr/bin/env', 'bash', script_path],
           WorkingDir: working_dir,
           Entrypoint: @entrypoint,
-          Volumes: @binds.map { |b| { b => { path_parent: 'rw' } } }.inject(:merge),
+          Volumes: binds.map { |b| { b => { path_parent: 'rw' } } }.inject(:merge),
           Env: @env.map { |k, v| "#{k}=#{v}" }
         )
         container.store_file(script_path, @script)

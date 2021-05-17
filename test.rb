@@ -61,10 +61,9 @@ describe MiniExec do
     expect(exec.runlog.join("\n").chomp).to eq('/gitlab/.gitlab-ci.yml')
   end
 
-# TODO: Make this work
-#  it 'supports not mounting CWD' do
-#    exec = MiniExec::MiniExec.new 'default-mount-test', mount_cwd: false
-#    exec.run_job
-#    expect(exec.runlog.join("\n").chomp).to eq('/gitlab/.gitlab-ci.yml')
-#  end
+  it 'supports not mounting CWD' do
+    exec = MiniExec::MiniExec.new 'default-mount-test', mount_cwd: false
+    exec.run_job
+    expect(exec.runlog.join("\n").chomp).to eq('/gitlab/.gitlab-ci.yml')
+  end
 end

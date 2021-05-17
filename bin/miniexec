@@ -10,7 +10,8 @@ options = {
   binds: [],
   env: {},
   path: '.',
-  docker: ENV['DOCKER_HOST'] || '/run/docker.sock'
+  docker: ENV['DOCKER_HOST'] || '/run/docker.sock',
+  cwd: true
 }
 
 OptionParser.new do |opts|
@@ -40,6 +41,10 @@ OptionParser.new do |opts|
           'Location of the docker socket') do |sock|
     options[:docker] = sock
   end
+  opts.on('-n', '--no-mount-cwd',
+          'Don\'t mount the CWD in the container\'s WORKDIR by default.') do
+    options[:cwd] = false
+  end
 end.parse!
 
 raise OptionParser::MissingArgument, 'Specify a job with -j' if options[:job].nil?
@@ -48,5 +53,6 @@ MiniExec::MiniExec.config(project_path: options[:path])
 exec = MiniExec::MiniExec.new options[:job],
                               docker_url: options[:docker],
                               binds: options[:binds],
-                              env: options[:env]
+                              env: options[:env],
+                              mount_cwd: options[:cwd] || false
 exec.run_job
