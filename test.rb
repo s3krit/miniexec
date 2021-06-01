@@ -12,6 +12,11 @@ describe MiniExec do
     expect(exec.script).to eq("echo 'hello'\necho 'goodbye'")
   end
 
+  it 'parses basic jobs in other files' do
+    exec = MiniExec::MiniExec.new 'basic-test', file: 'test.yml'
+    expect(exec.script).to eq("echo 'goodbye'\necho 'hello'")
+  end
+
   it 'uses the correct image' do
     exec1 = MiniExec::MiniExec.new 'basic-test'
     exec2 = MiniExec::MiniExec.new 'no-image-test'

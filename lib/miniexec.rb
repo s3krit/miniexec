@@ -32,10 +32,12 @@ module MiniExec
                    docker_url: nil,
                    binds: [],
                    env: {},
-                   mount_cwd: true)
+                   mount_cwd: true,
+                   file: nil)
       @job_name = job
       @project_path = project_path
-      @workflow = YAML.load(File.read("#{@project_path}/#{MiniExec.workflow_file}"))
+      file ||= "#{@project_path}/#{MiniExec.workflow_file}"
+      @workflow = YAML.load(File.read(file))
       @job = @workflow[job]
       @job['name'] = job
       @default_image = @workflow['image'] || 'debian:buster-slim'

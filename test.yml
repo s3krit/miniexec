@@ -1,0 +1,8 @@
+image: debian:latest
+
+basic-test:
+  stage: test
+  image: ubuntu:latest
+  script: |
+    echo 'goodbye'
+    echo 'hello'
