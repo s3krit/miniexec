@@ -47,10 +47,10 @@ module MiniExec
       @mount_cwd = mount_cwd
       @env = {}
       [
-        env,
-        gitlab_env,
         @workflow['variables'],
-        @job['variables']
+        @job['variables'],
+        gitlab_env,
+        env
       ].each do |var_set|
         @env.merge!(var_set.transform_values { |v| Util.expand_var(v.to_s, @env) }) if var_set
       end
