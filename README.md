@@ -99,3 +99,4 @@ miniexec -j miniexec-example-3 -e MY_USER=$USER -e MY_KEY=c3r34l-k1ll4h
 - Running full pipelines
 - Probably some other stuff. If you find one, make an issue, I'd love to fix it.
 - Specifying your environment variables with a file instead of one-by-one (soon™)
+- 'File' style variables
