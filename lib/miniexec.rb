@@ -41,7 +41,6 @@ module MiniExec
       @job = @workflow[job]
       @job['name'] = job
       @default_image = @workflow['image'] || 'debian:buster-slim'
-      @image = set_job_image
       @entrypoint = set_job_entrypoint
       @binds = binds
       @mount_cwd = mount_cwd
@@ -54,6 +53,7 @@ module MiniExec
       ].each do |var_set|
         @env.merge!(var_set.transform_values { |v| Util.expand_var(v.to_s, @env) }) if var_set
       end
+      @image = set_job_image
       @script = compile_script
       @runlog = []
       configure_logger
@@ -102,8 +102,7 @@ module MiniExec
         image = @job['image'] if @job['image'].instance_of?(String)
         image = @job['image']['name'] if @job['image'].instance_of?(Hash)
       end
-
-      image || @default_image
+      Util.expand_var(image, @env) || @default_image
     end
 
     def set_job_entrypoint
