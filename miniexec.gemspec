@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = 'miniexec'
-  s.version = '0.2.4'
+  s.version = '0.2.5'
   s.summary = 'exec a gitlab job'
   s.description = 'A minimal interpretor/executor for .gitlab-ci.yml'
   s.authors = ['Martin Pugh']
@@ -12,4 +12,6 @@ Gem::Specification.new do |s|
   s.homepage = 'https://github.com/s3krit/miniexec'
   s.license = 'AGPL-3.0-or-later'
   s.required_ruby_version = '>= 2.0'
+  s.add_runtime_dependency 'docker-api', '~> 2.1'
+  s.add_runtime_dependency 'git', '~> 1.8'
 end
